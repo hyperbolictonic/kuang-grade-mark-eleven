@@ -54,6 +54,10 @@ Call it with only the declared flat arguments:
 If the wrapper is exposed as a generated tool, call `wrap_orders_create` with
 the same flat arguments.
 
+`wrap_run` returns projected data, not a page. Context economy comes from the
+response recipe (`maxItems`, `maxChars`, `maxFieldChars`) and the pagination
+cap, not from JEV; JEV only applies to browser page reads.
+
 ### Inspect before writing
 
 Always run `wrap_get` before `wrap_run`. Do not guess argument names or assemble
