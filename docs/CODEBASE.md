@@ -369,6 +369,9 @@ patch tag publishes itself; a minor or major tag stays a draft for a human. See
 Settings are IPC-only. The HUD calls `window.electronAPI`. Do not add an HTTP route that writes settings.
 The recording tool gate depends on this rule.
 
+New settings tabs reuse the layout primitives (`settings-pane`, `settings-grid`, `settings-card`)
+described in [`SETTINGS_LAYOUT.md`](./SETTINGS_LAYOUT.md) instead of adding per-tab widths.
+
 ### Release
 
 1. Update `package.json`, `src/shared/version.ts` and `CHANGELOG.md`.

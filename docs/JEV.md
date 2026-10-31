@@ -60,7 +60,7 @@ HTTP status is 409.
 
 - **Cheap precheck**: before paying for a harvest, the guard measures
   `document.body.textContent` and refuses an obviously oversized unscoped read
-  in ~30 ms. The post-harvest guard stays authoritative, because inline marks
+  in ~15 ms. The post-harvest guard stays authoritative, because inline marks
   and URLs can push the real markdown over the threshold.
 - **Fail-open**: harvest errors, zero sections, or an index that is not smaller
   than the page serve the read instead of refusing it.

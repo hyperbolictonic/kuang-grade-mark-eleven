@@ -9,7 +9,8 @@ status: stable
 # Browser MCP API
 
 `hb-browser` is the MCP server that drives the visible Chromium session. It
-exposes 16 grouped tools plus two optional decision tools and a small set of MCP
+exposes 16 grouped tools plus two optional decision tools, and three optional
+page-compaction tools when JEV is on. It also serves a small set of MCP
 resources. It is configured and started by the agent client; the app must
 already be running.
 
@@ -39,6 +40,19 @@ Tool schemas are authoritative in `tools/list`; the source of truth is
 `src/mcp/tools-catalog.ts`. Deprecated names remain callable but are hidden
 from `tools/list`. `drive` and `decide` are absent unless a decision model is
 configured; when present they lead the surface and are Tier 1.
+
+## Page compaction (JEV)
+
+When **Settings → Decision Model → JEV page compaction** is on and a decision
+model is configured, the surface grows by `jev_index`, `read_section` and
+`search_page`. They lead `tools/list` and are the preferred way to read a page:
+`jev_index` returns a section index, `read_section` fetches only what is needed.
+
+With the read mode set to `enforce`, unscoped `observe(as: "markdown"|"text")`
+and `GET /markdown` are refused with `code: "JEV_REQUIRED"` (HTTP 409). Scoped
+reads (`region`), bounded reads (`budget > 0`, `cursor`), `full: true` and pages
+under 1,500 tokens remain available. See [JEV](../../docs/JEV.md) for the full
+contract.
 
 ## Tool manager
 

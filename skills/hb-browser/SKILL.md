@@ -36,6 +36,7 @@ Start with the grouped tools, not the old flat names:
 - `shadow_iframes` — frames and closed-shadow focus
 - `research` — read, search, LLM surface/fetch, crawl, topic research, prerender
 - `memory` — recall, history and bookmarks
+- `jev_index`, `read_section`, `search_page` — optional page compaction (only present when JEV is on)
 - `help` — categorized cheatsheet
 
 Old flat names are hidden from `tools/list` but remain callable through
@@ -62,9 +63,35 @@ Read the result:
 ```
 
 Use `extract({kind:"collect"})` when the page is a lazy or virtualized list.
-Use `observe({as:"markdown"})` for the readable page body.
+Use `observe({as:"markdown"})` for the readable page body; when `jev_index` is
+available, use it instead (see *Read a large page*).
+
+### Read a large page (JEV)
+
+When `jev_index` is in the tool list, prefer it over a full-page `observe`:
+
+```json
+{"name":"jev_index","arguments":{}}
+```
+
+The index lists sections with ids, token weights and one-line digests. Fetch only
+what the task needs:
+
+```json
+{"name":"read_section","arguments":{"section_id":"sec_2","include_children":true}}
+{"name":"search_page","arguments":{"query":"refund policy"}}
+```
+
+In **enforce** mode an unscoped `observe({as:"markdown"|"text"})` returns
+`code: "JEV_REQUIRED"` (HTTP 409). Do not retry it: read the index, scope with
+`region`, page with `budget`/`cursor`, or pass `full: true` only when the whole
+page is genuinely required (bypasses are logged). Pages under 1,500 tokens are
+served normally.
 
 ### Inspect the current page
+
+If the tool list includes `jev_index`, read the index first (see above). For a
+small page, or to look at the rendered state:
 
 ```json
 {"name":"observe","arguments":{"as":"markdown","budget":12000}}

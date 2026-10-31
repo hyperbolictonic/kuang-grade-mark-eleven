@@ -440,9 +440,9 @@ Hyperbolic Gateway features an embedded, serverless vector database (**LanceDB**
 
 <a id="sec-standardized-semantic-mcp-tools-63-advertised" name="sec-standardized-semantic-mcp-tools-63-advertised"></a>
 
-## 🔌 Consolidated Semantic MCP Tools (16 advertised · +2 optional)
+## 🔌 Consolidated Semantic MCP Tools (16 advertised · +2 decision · +3 JEV)
 
-> **Advertised surface:** 16 grouped tools, plus `drive` and `decide` when a decision model is configured. The old flat names remain callable by name but are hidden from `tools/list`; they are listed below as the underlying catalog.
+> **Advertised surface:** 16 grouped tools, plus `drive` and `decide` when a decision model is configured, and `jev_index`, `read_section` and `search_page` when JEV page compaction is on. The old flat names remain callable by name but are hidden from `tools/list`; they are listed below as the underlying catalog.
 >
 > **Tool manager:** Settings → Tools controls enablement, order, per-tool instructions, per-action instructions for grouped tools, and Core/Research/Automation/Full presets. The default order starts with `navigate` → `observe` → `act` → `wait_for` → `find` → `extract`.
 
@@ -466,6 +466,9 @@ Hyperbolic Gateway features an embedded, serverless vector database (**LanceDB**
 | `research` | read, search, LLM surface/fetch, crawl, topic research, prerender |
 | `memory` | recall, browsing history and bookmarks |
 | `help` | Categorized operational cheatsheet |
+| `jev_index` *(JEV)* | Section index for the active page — the preferred read when JEV is on |
+| `read_section` *(JEV)* | Fetch one indexed section, optionally with children |
+| `search_page` *(JEV)* | Keyword/regex search across all section text |
 | `drive` *(optional)* | Goal-driven observe → decide → act loop |
 | `decide` *(optional)* | Typed decision model |
 
@@ -777,6 +780,7 @@ Type-check and bundles: `npx tsc --noEmit`, `npm run build`, `npm run build:mcp`
 - **[`docs/FIELD_NOTES_2026-10-18.md`](./docs/FIELD_NOTES_2026-10-18.md)** - root-caused findings from hardening the TIER-1 path on real SPAs.
 - **[`docs/FIELD_NOTES_2026-10-20_SIGNUP.md`](./docs/FIELD_NOTES_2026-10-20_SIGNUP.md)** - the signup dogfood run: three silent no-ops, and the plan they produced.
 - **[`docs/DECISION_MODELS.md`](./docs/DECISION_MODELS.md)** - the optional decision layer: `decide` / `drive`, guard + elimination, gates, screenshots, and who decides what.
+- **[`docs/JEV.md`](./docs/JEV.md)** - Just-Enough-View: the surface index, `prefer` / `enforce` modes, refusals and the preferred reading path.
 - **[`docs/BUILDING.md`](./docs/BUILDING.md)** - installers for Windows/macOS/Linux, signing (macOS unsigned first), GitHub Releases, and auto-update.
 - **[`kuang_docs/`](./kuang_docs/okf.json)** — the **OKF bundle** (`kuang_browser_docs`): playbook/reference partitions, also served to agents as standard MCP resources:
   - `mark-eleven://skills/guide` — the full operational manual.

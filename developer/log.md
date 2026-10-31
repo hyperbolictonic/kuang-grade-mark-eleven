@@ -1,5 +1,12 @@
 # Developer Knowledge Update Log
 
+## 2026-10-31
+
+* **Creation**: Documented JEV page compaction: the surface index, `prefer`/`enforce` modes, the `JEV_REQUIRED` refusal contract, the cheap precheck and tool gating (`docs/JEV.md`), and linked it from the docs hub and README.
+* **Creation**: Added `docs/SETTINGS_LAYOUT.md` with the reusable `settings-pane`, `settings-grid` and `settings-card` primitives; every settings tab except Tools/Wrappers now shares one centred column.
+* **Update**: The `hb-browser` skill, the Browser MCP API page and the skills overview now describe `jev_index` / `read_section` / `search_page` and the enforce-mode reading rules.
+* **Update**: Published `docs/JEV.md` and `docs/SETTINGS_LAYOUT.md` in the Pages build.
+
 ## 2026-10-30
 
 * **Creation**: Added the Settings -> Tools tool manager: enable/disable, tiered drag order, per-tool instruction overrides, per-tool and global reset.
