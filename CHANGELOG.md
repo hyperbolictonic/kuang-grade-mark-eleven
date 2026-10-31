@@ -16,6 +16,74 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > therefore reports `1.4.2` in `/health`. This is a deliberate, temporary deviation from strict semver; each
 > increment still gets its own Added/Fixed/Changed section here.
 
+## [1.7.1] - 2026-10-31
+
+The **human collaboration + JEV** release. The deck gains a gated collaboration
+mode for anchoring notes and questions on the live page, and the browser MCP
+gains an optional Just-Enough-View reading path for large pages.
+
+### Added
+
+- **Human–LLM collaboration (experimental, default off).** Humans and agents
+  share a thread on a page element instead of trading screenshots:
+  - page-anchored notes and questions with a highlight overlay, inline add-note
+    control, anchored drawer and composer;
+  - an element picker and action toolbar over the live browser view;
+  - a thread panel with agent replies, resolve and a concise note list;
+  - notes stay anchored through document scroll, human notes preview in amber,
+    and an unsaved draft survives a failed save.
+- **`collaborate` MCP tool:** `highlight`, `ask`, `read`, `list`, `reply` and
+  `resolve` over the collaboration store.
+- **Command Deck:** the deck collapses to a free-floating orb with a radial petal
+  menu, status lights and drag docking; themed menus and Escape-to-exit. The
+  standalone NOTE petal retired — notes now live in collaboration.
+- **JEV (Just-Enough-View) page compaction.** Optional, not experimental:
+  - `jev_index`, `read_section` and `search_page` build a compact section index
+    (headings, token weights, one-line digests) over an in-memory depth store;
+  - a master switch plus `prefer` / `enforce` read modes, persisted to `jev.json`
+    over IPC;
+  - `enforce` refuses unscoped `observe(as:"markdown"|"text")` and `GET /markdown`
+    with `JEV_REQUIRED` (HTTP 409); region-scoped, budgeted/cursor, `full: true`
+    and pages under 1,500 tokens remain available;
+  - a cheap precheck refuses oversized reads before the harvest (~15 ms), a
+    60-second loop breaker serves the read after two refusals, and harvest
+    errors fail open;
+  - fold hints, a navigate nudge, `GET /jev/stats`, and `GET /tools/config`
+    reporting `jev: { available, mode }`.
+- **Installable agent skills:** `hb-browser` and `hb-wrap`, with Hermes and
+  Skills CLI install commands.
+
+### Changed
+
+- **Settings layout:** every tab now shares one centred `56rem` pane (`72rem`
+  for Tools/Wrappers), with reusable `settings-grid` rows and `settings-card`
+  blocks. Helper text wraps instead of overflowing, and the scrollbar gutter
+  keeps the pane position stable.
+- **Tool surface:** 16 grouped tools — `collaborate` is the addition — plus
+  `drive` / `decide` when a decision model is configured and the three JEV tools
+  only when JEV is on. With JEV off the three schemas (~1k tokens) are not
+  advertised at all.
+- **Documentation:** new `docs/JEV.md` and `docs/SETTINGS_LAYOUT.md`, a README
+  feature section, and both pages published in the GitHub Pages build. The
+  `hb-browser` skill teaches `jev_index → read_section`; `hb-wrap` documents
+  `wrap_test` dry-runs and the recipe limits that replace JEV on REST results.
+
+### Fixed
+
+- Collaboration: the card Resolve control works; the picker returns its target
+  over IPC; highlights and the composer stay anchored on scroll; the action menu
+  renders above the browser view; Escape cancels note mode, the picker and element
+  toolbar; a kept draft is offered after a failed save.
+- JEV: the index reports the rendered index size rather than the page size.
+
+### Compatibility
+
+- Collaboration is off by default and only appears after enabling it in
+  Settings → EXPERIMENTAL. The `collaborate` tool is additive.
+- JEV is off by default. A legacy `{ enabled: true }` file migrates to
+  `power: true, mode: "prefer"` — never silently to enforce.
+- Settings storage, tool names and the bridge port are unchanged.
+
 ## [1.7.0] - 2026-10-30
 
 The **consolidated tool surface** release. The browser MCP now advertises 15
