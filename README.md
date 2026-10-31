@@ -17,11 +17,11 @@
 
 - **About** — [What it is](#sec-what-it-is) · [A punk-ethos alternative to browser clouds](#sec-a-punk-ethos-diy-alternative-to-browser-use-play)
 - **The deck** — [Theme & Cyberdeck UI](#sec-theme-cyberdeck-interface) · [Ghost cursor telemetry](#sec-ghost-cursor-telemetry-engine) · [Focus-independent input](#sec-focus-independent-input-background-rendering) · [Multi-tab browsing](#sec-hardware-accelerated-multi-tab-browsing)
-- **Reading the web** — [Orthogonal primitive layer](#sec-orthogonal-primitive-layer) · [Construct harvester](#sec-token-efficient-construct-harvester) · [Set-of-Marks](#sec-set-of-marks-som-visual-grounding)
+- **Reading the web** — [Orthogonal primitive layer](#sec-orthogonal-primitive-layer) · [Construct harvester](#sec-token-efficient-construct-harvester) · [JEV page compaction](#sec-jev-page-compaction) · [Set-of-Marks](#sec-set-of-marks-som-visual-grounding)
 - **Driving the web** — [Shield-breaker](#sec-autonomous-shield-breaker-cookie-gdpr-destroyer) · [Form filler](#sec-single-turn-batch-form-filler) · [Human-in-the-loop](#sec-human-in-the-loop-hil-intervention-protocol)
 - **Memory & data** — [Cortex](#sec-lancedb-persistent-cortex-semantic-recall) · [Downloads](#sec-download-manager-cortex-harvester) · [Session vault](#sec-session-cookie-jar-vault) · [Script vault](#sec-script-vault-lancedb-semantic-macro-engine) · [Timelapse recorder](#sec-timelapse-recorder)
 - **Inspection** — [Network & API streams](#sec-live-network-api-stream-interceptor) · [WebSocket & SSE](#sec-real-time-websocket-sse-interceptor)
-- **Operating it** — [System tray](#sec-system-tray-background-minimization-out-of-the-w) · [MCP tools (16 advertised +2 optional)](#sec-standardized-semantic-mcp-tools-63-advertised) · [Agent skills](#sec-agent-skills) · [REST wrappers](#sec-rest-wrappers-hb-rest)
+- **Operating it** — [System tray](#sec-system-tray-background-minimization-out-of-the-w) · [MCP tools (16 advertised · +2 decision · +3 JEV)](#sec-standardized-semantic-mcp-tools-63-advertised) · [Agent skills](#sec-agent-skills) · [REST wrappers](#sec-rest-wrappers-hb-rest)
 - **Building on it** — [Architecture lowdown](./docs/CODEBASE.md) · [Codebase & docs](#sec-codebase-directory-structure-documentation) · [Quickstart](#sec-quickstart) · [Testing](#sec-testing) · [OKF knowledge](#sec-documentation-knowledge-okf)
 - **Optional decision layer** — [`decide` / `drive` design notes](./docs/DECISION_MODELS.md) · [Control layer: targeting, consent, human takeover](./docs/CONTROL_LAYER.md) · [Shadow DOM & iframes: what Hyperbolic Gateway can see and click](./docs/SHADOW_DOM_AND_FRAMES.md) · [Shadow Walk: sealed-content plan](./docs/SHADOW_WALK.md) · [Field notes from dogfooding](./docs/FIELD_NOTES_2026-10-20_SIGNUP.md) · [Changelog](./CHANGELOG.md)
 - **Release notes** — [What shipped](#sec-release-notes) · [All releases](./CHANGELOG.md)
@@ -272,7 +272,38 @@ The older tool list is being consolidated onto **a few orthogonal verbs** - one 
   ---
   ```
   `reader` names the extraction path; `extracted_chars` and `page_chars` are the same unit (characters of page text), so coverage is comparable. A partly-visible page says so, and names the alternates, instead of looking short.
-- **Pageable by default:** `observe(as:"markdown")` returns a 25,000-character view; `budget` + `next_cursor` page through the rest, and `budget: 0` returns the whole construct.
+- **Pageable by default:** `observe(as:"markdown")` returns a 25,000-character view; `budget` + `next_cursor` page through the rest, and `budget: 0` returns the whole construct. On very large pages, [JEV](#sec-jev-page-compaction) adds a section index on top.
+
+<a id="sec-jev-page-compaction" name="sec-jev-page-compaction"></a>
+
+## 🗜️ JEV Page Compaction
+
+**Just-Enough-View (JEV)** keeps a large page out of the agent's context window.
+Instead of a full Markdown dump, the agent gets a compact **section index** —
+headings, token weights and one-line digests — and fetches only the sections it
+needs from an in-memory depth store.
+
+- **Where:** Settings → **Decision Model → JEV page compaction**. Optional, not
+  experimental; a master switch plus a read mode. Both are disabled until a
+  decision model is configured. Persisted to `jev.json` over IPC.
+- **`prefer` (default):** `jev_index`, `read_section` and `search_page` lead the
+  tool surface; full-page reads still work.
+- **`enforce`:** unscoped `observe(as:"markdown"|"text")` and `GET /markdown`
+  return `JEV_REQUIRED` (HTTP 409). Region-scoped reads, budgeted reads
+  (`budget > 0` or `cursor`), `full: true` and pages under 1,500 tokens still
+  work. Every other projection — `som`, `components`, `ax`, `list`, `table`,
+  `app_data`, `find`/`extract`/`act`, screenshots — is untouched.
+- **A funnel, not a trap:** a cheap precheck refuses an obviously oversized read
+  before the harvest (~15 ms). After two refusals for the same URL in 60 seconds,
+  the next read is served with a note rather than blocking the turn. Harvest
+  errors and unhelpful indexes fail open.
+- **Measured:** a 14,823-token Wikipedia article becomes a ~396-token index;
+  index plus one section is ~2,045 tokens (86–97% saved).
+- **Free when off:** the three tools are not advertised at all, so their schemas
+  (~1k tokens per request) are not billed.
+
+Tools: `jev_index`, `read_section`, `search_page`. Full contract and limits:
+[`docs/JEV.md`](./docs/JEV.md).
 
 ---
 
@@ -742,6 +773,10 @@ npx skills add hyperbolictonic/hyperbolic-gateway --skill hb-wrap
 For a non-interactive global install, add `-g -y`. The source files are
 [`skills/hb-browser/SKILL.md`](./skills/hb-browser/SKILL.md) and
 [`skills/hb-wrap/SKILL.md`](./skills/hb-wrap/SKILL.md).
+
+`hb-browser` covers the grouped tools plus the JEV read path (`jev_index` →
+`read_section`, including the enforce refusal); `hb-wrap` covers wrapper
+discovery, `wrap_test` dry-runs, recipes and credential hand-off.
 
 ---
 
