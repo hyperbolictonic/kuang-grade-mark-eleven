@@ -22,6 +22,7 @@ The app must be running. The wrapper service talks to the local bridge at
 - `wrap_list` — list saved wrappers
 - `wrap_get` — inspect one wrapper and its input schema
 - `wrap_run` — execute a wrapper with flat semantic arguments
+- `wrap_test` — dry-run the request or render a sample response; sends nothing
 - `wrap_derive` — infer a first-draft response recipe from JSON or a URL
 - `wrap_create` — save a wrapper
 - `wrap_update` — replace a wrapper
@@ -57,7 +58,23 @@ the same flat arguments.
 
 Always run `wrap_get` before `wrap_run`. Do not guess argument names or assemble
 a URL yourself. The wrapper owns the URL, method, query, headers and body
-templates.
+templates. Verify a new or edited wrapper with `wrap_test` (dry-run is the
+default) before spending a live request.
+
+### Dry-run before the live call
+
+Preview the exact request without sending it:
+
+```json
+{"name":"wrap_test","arguments":{"id":"orders.create","args":{"customer_id":"cus_123","quantity":2}}}
+```
+
+`wrap_test` defaults to `dryRun: true`. After editing a recipe, pass a sample
+response to check the rendering instead of guessing:
+
+```json
+{"name":"wrap_test","arguments":{"id":"orders.create","sample":{"items":[{"id":1,"name":"A"}]}}}
+```
 
 ### Derive a recipe from a sample
 
@@ -120,4 +137,5 @@ If the secret is missing or rejected, ask the human to refresh it.
 }
 ```
 
-Then inspect the result and test the actual call before relying on it.
+Then dry-run it with `wrap_test`, check the rendered sample, and only then rely
+on `wrap_run`.

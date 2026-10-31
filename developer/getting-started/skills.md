@@ -45,5 +45,6 @@ skills.
 - `hb-browser`: research → navigate → extract, observe → extract, find → act →
   observe, large-page reads through JEV (`jev_index` → `read_section`), form
   fill, debugging, human hand-off and recipe replay.
-- `hb-wrap`: discover a wrapper, inspect its schema, call it with flat
-  arguments, derive a response recipe, and keep credential values human-only.
+- `hb-wrap`: discover a wrapper, inspect its schema, dry-run it with `wrap_test`,
+  call it with flat arguments, derive a response recipe, and keep credential
+  values human-only.
